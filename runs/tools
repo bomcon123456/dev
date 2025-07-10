@@ -1,0 +1,229 @@
+#!/usr/bin/env bash
+
+set -e
+
+mkdir -p ~/.local/bin
+LOCAL_BIN="$HOME/.local/bin"
+TMP_DIR="/tmp/cli-install"
+
+# Check command
+has_command() {
+    command -v "$1" &>/dev/null
+}
+
+# Check for root privileges
+has_root() {
+    sudo -n true 2>/dev/null
+}
+
+# fd-find
+install_fd() {
+    if has_command fd; then
+        echo "✔ fd is already installed"
+        return
+    fi
+
+    echo "Installing fd..."
+    if has_root; then
+        sudo apt-get update
+        sudo apt-get install -y fd-find
+        if ! has_command fd && has_command fdfind; then
+            ln -sf "$(command -v fdfind)" "$LOCAL_BIN/fd"
+            echo "Note: symlinked fdfind to fd in ~/.local/bin"
+        fi
+    else
+        echo "Installing fd without root..."
+        cd "$TMP_DIR"
+        LATEST=$(curl -s https://api.github.com/repos/sharkdp/fd/releases/latest | grep tag_name | cut -d '"' -f 4)
+        ARCH=$(uname -m)
+        case "$ARCH" in
+            x86_64) ARCH_TYPE="x86_64-unknown-linux-gnu" ;;
+            aarch64|arm64) ARCH_TYPE="aarch64-unknown-linux-gnu" ;;
+            *) echo "Unsupported_arch: $ARCH"; return 1 ;;
+        esac
+        URL="https://github.com/sharkdp/fd/releases/download/${LATEST}/fd-${LATEST}-${ARCH_TYPE}.tar.gz"
+        curl -LO "$URL"
+        tar -xf fd-${LATEST}-${ARCH_TYPE}.tar.gz
+        cp "fd-${LATEST}-${ARCH_TYPE}/fd" "$LOCAL_BIN"
+        chmod +x "$LOCAL_BIN/fd"
+        echo "✔ fd installed to $LOCAL_BIN"
+    fi
+}
+
+# bat
+install_bat() {
+    if has_command bat; then
+        echo "✔ bat is already installed"
+        return
+    fi
+
+    echo "Installing bat..."
+    if has_root; then
+        sudo apt-get update
+        sudo apt-get install -y bat
+        if ! has_command bat && has_command batcat; then
+            ln -sf "$(command -v batcat)" "$LOCAL_BIN/bat"
+            echo "Note: symlinked batcat to bat in ~/.local/bin"
+        fi
+    else
+        echo "Installing bat without root..."
+        cd "$TMP_DIR"
+        LATEST=$(curl -s https://api.github.com/repos/sharkdp/bat/releases/latest | grep tag_name | cut -d '"' -f 4)
+        ARCH=$(uname -m)
+        case "$ARCH" in
+            x86_64) ARCH_TYPE="x86_64-unknown-linux-gnu" ;;
+            aarch64|arm64) ARCH_TYPE="aarch64-unknown-linux-gnu" ;;
+            *) echo "Unsupported arch: $ARCH"; return 1 ;;
+        esac
+        URL="https://github.com/sharkdp/bat/releases/download/${LATEST}/bat-${LATEST}-${ARCH_TYPE}.tar.gz"
+        curl -LO "$URL"
+        tar -xf bat-${LATEST}-${ARCH_TYPE}.tar.gz
+        cp "bat-${LATEST}-${ARCH_TYPE}/bat" "$LOCAL_BIN"
+        chmod +x "$LOCAL_BIN/bat"
+        echo "✔ bat installed to $LOCAL_BIN"
+    fi
+}
+
+# ripgrep (rg)
+install_rg() {
+    if has_command rg; then
+        echo "✔ ripgrep is already installed"
+        return
+    fi
+
+    echo "Installing ripgrep..."
+    if has_root; then
+        sudo apt-get update
+        sudo apt-get install -y ripgrep
+    else
+        echo "Installing ripgrep without root..."
+        cd "$TMP_DIR"
+        LATEST=$(curl -s https://api.github.com/repos/BurntSushi/ripgrep/releases/latest | grep tag_name | cut -d '"' -f 4)
+        ARCH=$(uname -m)
+        case "$ARCH" in
+            x86_64) ARCH_TYPE="x86_64-unknown-linux-musl" ;;
+            aarch64|arm64) ARCH_TYPE="aarch64-unknown-linux-musl" ;;
+            *) echo "Unsupported arch: $ARCH"; return 1 ;;
+        esac
+        URL="https://github.com/BurntSushi/ripgrep/releases/download/${LATEST}/ripgrep-${LATEST}-${ARCH_TYPE}.tar.gz"
+        curl -LO "$URL"
+        tar -xf ripgrep-${LATEST}-${ARCH_TYPE}.tar.gz
+        cp "ripgrep-${LATEST}-${ARCH_TYPE}/rg" "$LOCAL_BIN"
+        chmod +x "$LOCAL_BIN/rg"
+        echo "✔ ripgrep installed to $LOCAL_BIN"
+    fi
+}
+
+# Neovim (nvim)
+install_nvim() {
+    if has_command nvim; then
+        echo "✔ nvim is already installed"
+        return
+    fi
+
+    echo "Installing nvim..."
+    if has_root; then
+        sudo apt-get update
+        sudo apt-get install -y neovim
+    else
+        echo "Installing nvim without root..."
+        cd "$TMP_DIR"
+        LATEST=$(curl -s https://api.github.com/repos/neovim/neovim/releases/latest | grep tag_name | cut -d '"' -f 4)
+        URL="https://github.com/neovim/neovim/releases/download/${LATEST}/nvim-linux-x86_64.tar.gz"
+        curl -LO "$URL"
+        tar -xzf nvim-linux-x86_64.tar.gz
+        cp nvim-linux-x86_64/bin/nvim "$LOCAL_BIN"
+        chmod +x "$LOCAL_BIN/nvim"
+        echo "✔ nvim installed to $LOCAL_BIN"
+    fi
+}
+
+install_eza() {
+    if has_command eza; then
+        echo "✔ eza is already installed"
+        return
+    fi
+
+    echo "Installing eza..."
+    if has_root; then
+        # Check if eza is available in default repos
+        if apt-cache show eza &>/dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y eza
+        else
+            echo "⚠ 'eza' not available in apt sources. Installing without root..."
+        fi
+    fi
+
+    if ! has_command eza; then
+        echo "Installing eza without root..."
+        cd "$TMP_DIR"
+        LATEST=$(curl -s https://api.github.com/repos/eza-community/eza/releases/latest | grep tag_name | cut -d '"' -f 4)
+        ARCH=$(uname -m)
+        case "$ARCH" in
+        x86_64) ARCH_TYPE="x86_64-unknown-linux-gnu" ;;
+        aarch64 | arm64) ARCH_TYPE="aarch64-unknown-linux-gnu" ;;
+        *) echo "Unsupported arch: $ARCH" && return 1 ;;
+        esac
+
+        URL="https://github.com/eza-community/eza/releases/download/${LATEST}/eza_${ARCH_TYPE}.tar.gz"
+
+        curl -LO "$URL"
+        tar -xzf "eza_${ARCH_TYPE}.tar.gz"
+
+        if [ -f "eza" ]; then
+            cp eza "$LOCAL_BIN"
+        else
+            chmod x eza*/eza
+            cp eza*/eza "$LOCAL_BIN"
+        fi
+
+        chmod x "$LOCAL_BIN/exa"
+        echo "✔ eza installed to $LOCAL_BIN"
+    fi
+}
+
+install_yazi() {
+    if has_command yazi; then
+        echo "✔ yazi is already installed"
+        return
+    fi
+
+    echo "Installing yazi..."
+    cd "$TMP_DIR"
+    LATEST=$(curl -s https://api.github.com/repos/sxyazi/yazi/releases/latest | grep tag_name | cut -d '"' -f 4)
+    ARCH=$(uname -m)
+    case "$ARCH" in
+    x86_64) ARCH_TYPE="x86_64-unknown-linux-gnu" ;;
+    aarch64 | arm64) ARCH_TYPE="aarch64-unknown-linux-gnu" ;;
+    *) echo "Unsupported arch: $ARCH" && return 1 ;;
+    esac
+
+    URL="https://github.com/sharkdp/fd/releases/download/${LATEST}/yazi-${ARCH_TYPE}.zip"
+    curl -LO "$URL"
+    unzip -q yazi-${ARCH_TYPE}.zip
+    cp "yazi-${ARCH_TYPE}/yazi" "$LOCAL_BIN"
+    chmod +x "$LOCAL_BIN/yazi"
+    echo "✔ yazi installed to $LOCAL_BIN"
+}
+
+
+
+##################################################
+# Main
+##################################################
+
+mkdir -p "$TMP_DIR"
+mkdir -p "$LOCAL_BIN"
+
+install_fd
+install_bat
+install_rg
+install_eza
+install_yazi
+install_nvim
+
+echo ""
+echo "✅ All tools installed."
+echo "➡ Make sure $HOME/.local/bin is in your PATH!"
+

@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+./run zsh_plugins
+./run tools
+./run fzf
+./run conda

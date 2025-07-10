@@ -1,0 +1,24 @@
+# cursor-style = block
+# cursor-style-blink = false
+# shell-integration-features = no-cursor
+quit-after-last-window-closed = true
+shell-integration =  zsh
+
+
+font-family = "BlexMono Nerd Font"
+font-size = 20
+font-thicken = true
+bold-is-bright = true
+
+window-padding-x = 20,20
+window-padding-y = 20,20
+window-decoration = false
+
+theme = kanagawabones
+
+#################
+## keybindings ##
+#################
+# Some useful encoded characters:
+keybind = cmd+j=text:\x1bj
+keybind = cmd+k=text:\x1bk
