@@ -90,9 +90,6 @@ function yy() {
 	fi
 	rm -f -- "$tmp"
 }
-#Custom binding
-bindkey -s ^f "t\n"
-bindkey -s '^o' 'EDITOR=nvim yy\n'  # zsh
 
 pcat() {
     printf "%s" "$(cat "$1")" | pbcopy
