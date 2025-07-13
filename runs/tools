@@ -174,11 +174,12 @@ install_eza() {
         if [ -f "eza" ]; then
             cp eza "$LOCAL_BIN"
         else
-            chmod x eza*/eza
+            chmod +x eza*/eza
             cp eza*/eza "$LOCAL_BIN"
         fi
 
-        chmod x "$LOCAL_BIN/exa"
+        chmod +x "$LOCAL_BIN/eza"
+        mv "$LOCAL_BIN/eza" "$LOCAL_BIN/exa"
         echo "✔ eza installed to $LOCAL_BIN"
     fi
 }
@@ -199,7 +200,7 @@ install_yazi() {
     *) echo "Unsupported arch: $ARCH" && return 1 ;;
     esac
 
-    URL="https://github.com/sharkdp/fd/releases/download/${LATEST}/yazi-${ARCH_TYPE}.zip"
+    URL="https://github.com/sxyazi/yazi/releases/download/${LATEST}/yazi-${ARCH_TYPE}.zip"
     curl -LO "$URL"
     unzip -q yazi-${ARCH_TYPE}.zip
     cp "yazi-${ARCH_TYPE}/yazi" "$LOCAL_BIN"
