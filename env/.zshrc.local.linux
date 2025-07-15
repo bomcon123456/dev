@@ -1,0 +1,15 @@
+export GTK_IM_MODULE=ibus
+export XMODIFIERS=@im=ibus
+export QT_IM_MODULE=ibus
+export WS=linux
+
+pcat() {
+    if [[ -f "$1" ]]; then
+        (cat "$1") | xclip -selection clipboard
+        echo "Content of '$1' copied to clipboard with newline."
+    else
+        echo "File '$1' not found."
+    fi
+
+}
+

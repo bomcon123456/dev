@@ -66,22 +66,6 @@ zstyle ':fzf-tab:complete:cd:*' fzf-preview 'tree -C $realpath | less'
 # switch group using `,` and `.`
 # zstyle ':fzf-tab:*' switch-group ',' '.'
 
-##
-lfcd () {
-    tmp="$(mktemp)"
-    # `command` is needed in case `lfcd` is aliased to `lf`
-    EDITOR=nvim lf -last-dir-path="$tmp" "$@"
-    if [ -f "$tmp" ]; then
-        dir="$(cat "$tmp")"
-        rm -f "$tmp"
-        if [ -d "$dir" ]; then
-            if [ "$dir" != "$(pwd)" ]; then
-                cd "$dir"
-            fi
-        fi
-    fi
-}
-
 function yy() {
 	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
 	yazi "$@" --cwd-file="$tmp"
@@ -91,8 +75,9 @@ function yy() {
 	rm -f -- "$tmp"
 }
 
-pcat() {
-    printf "%s" "$(cat "$1")" | pbcopy
-}
 
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=13'
+
+eval "$(zoxide init zsh)"
+source ~/.zsh_profile
+[[ -f ~/.zshrc.local ]] && source ~/.zshrc.local

@@ -26,16 +26,6 @@ ex ()
   fi
 }
 
-pcat() {
-    if [[ -f "$1" ]]; then
-        (cat "$1") | xclip -selection clipboard
-        echo "Content of '$1' copied to clipboard with newline."
-    else
-        echo "File '$1' not found."
-    fi
-
-}
-
 function cvpn() {
     snx -d
 
@@ -85,7 +75,6 @@ alias egrep='egrep --color=auto'
 alias fgrep='fgrep --color=auto'
 
 # confirm before overwriting something
-#alias cp="cp -i"
 alias mv='mv -i'
 alias rm='rm -i'
 
@@ -102,21 +91,11 @@ alias psmem10='ps auxf | sort -nr -k 4 | head -10'
 alias pscpu='ps auxf | sort -nr -k 3'
 alias pscpu10='ps auxf | sort -nr -k 3 | head -10'
 
-# git
-alias addall='git add .'
-alias clone='git clone'
-alias commit='git commit -m'
-alias fetch='git fetch'
-alias pull='git pull origin'
-alias push='git push origin'
-alias status='git status'
-
 alias jctl="journalctl -p 3 -xb"
 
 alias ufont="fc-cache -fv"
 alias ffont="fc-list | grep -i "
 
-# alias ssh="kitty +kitten ssh"
 alias ssh="TERM=xterm-256color ssh"
 alias sshp="sshpass -f ~/pass ssh"
 alias scpp="sshpass -f ~/pass scp"

@@ -12,6 +12,35 @@ if [ -z "$DEV_ENV" ]; then
     exit 1
 fi
 
+if [ -z "$WS" ]; then
+    echo "env var WS needs to be present"
+    exit 1
+fi
+
+is_mac=false
+is_linux=false
+is_server=false
+
+# Logic based on WS value
+case "$WS" in
+mac)
+    echo "Detected macOS environment via WS=$WS"
+    is_mac=true
+    ;;
+linux)
+    echo "Detected Linux environment via WS=$WS"
+    is_linux=true
+    ;;
+server)
+    echo "Detected server environment via WS=$WS"
+    is_server=true
+    ;;
+*)
+    echo "Warning: Unknown WS environment value: $WS"
+    exit 1
+    ;;
+esac
+
 if [[ $1 == "--dry" ]]; then
     dry_run="1"
 fi
@@ -28,9 +57,9 @@ log "env: $DEV_ENV"
 
 update_files() {
     log "copying over files from: $1"
-    pushd $1 &> /dev/null
+    pushd $1 &>/dev/null
     (
-        configs=`find . -mindepth 1 -maxdepth 1 -type d`
+        configs=$(find . -mindepth 1 -maxdepth 1 -type d)
         for c in $configs; do
             directory=${2%/}/${c#./}
             log "    removing: rm -rf $directory"
@@ -46,7 +75,7 @@ update_files() {
         done
 
     )
-    popd &> /dev/null
+    popd &>/dev/null
 }
 
 copy() {
@@ -66,17 +95,37 @@ update_files $DEV_ENV/env/.local $HOME/.local
 copy $DEV_ENV/env/.zsh_aliases $HOME/.zsh_aliases
 copy $DEV_ENV/env/.zsh_profile $HOME/.zsh_profile
 copy $DEV_ENV/env/.zsh_robbyrussell.zsh-theme $HOME/.oh-my-zsh/custom/robbyrussell.zsh-theme
+copy $DEV_ENV/env/.zsh_aliases $HOME/.zsh_aliases
 copy $DEV_ENV/env/.zshrc $HOME/.zshrc
-copy $DEV_ENV/env/.xprofile $HOME/.xprofile
+copy $DEV_ENV/env/.gitconfig $HOME/.gitconfig
+
+if [ "$is_linux" = true ]; then
+    echo "Copying linux-specific config..."
+    copy $DEV_ENV/env/.xprofile $HOME/.xprofile
+    copy $DEV_ENV/env/.gitconfig.local.linux $HOME/.gitconfig.local
+    copy $DEV_ENV/env/.zshrc.local.linux $HOME/.zshrc.local
+elif [ "$is_mac" = true ]; then
+    echo "Copying macOS-specific config..."
+    copy $DEV_ENV/env/.gitconfig.local.mac $HOME/.gitconfig.local
+    copy $DEV_ENV/env/.zshrc.local.mac $HOME/.zshrc.local
+elif [ "$is_server" = true ]; then
+    echo "Copying server-specific config..."
+    copy $DEV_ENV/env/.gitconfig.local.linux $HOME/.gitconfig.local
+    copy $DEV_ENV/env/.zshrc.local.linux $HOME/.zshrc.local
+fi
+
 copy $DEV_ENV/dev-env $HOME/.local/scripts/dev-env
 
 mkdir -p $HOME/.local/bin
 
-if command -v conda &> /dev/null; then
+if command -v conda &>/dev/null; then
     echo "Conda found, initializing..."
-    conda init bash
     conda init zsh
+    sed -n '/>>> conda initialize >>>/,/<<< conda initialize <<</p' ~/.zshrc >>~/.zshrc.local
+    sed -i '/>>> conda initialize >>>/,/<<< conda initialize <<</d' ~/.zshrc
+    conda init bash
+    sed -n '/>>> conda initialize >>>/,/<<< conda initialize <<</p' ~/.bashrc >>~/.bashrc.local
+    sed -i '/>>> conda initialize >>>/,/<<< conda initialize <<</d' ~/.bashrc
 else
     echo "Conda not found in PATH. Skipping initialization."
 fi
-

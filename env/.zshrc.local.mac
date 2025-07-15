@@ -1,0 +1,5 @@
+export WS=mac
+
+pcat() {
+    printf "%s" "$(cat "$1")" | pbcopy
+}

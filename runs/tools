@@ -37,9 +37,12 @@ install_fd() {
         LATEST=$(curl -s https://api.github.com/repos/sharkdp/fd/releases/latest | grep tag_name | cut -d '"' -f 4)
         ARCH=$(uname -m)
         case "$ARCH" in
-            x86_64) ARCH_TYPE="x86_64-unknown-linux-gnu" ;;
-            aarch64|arm64) ARCH_TYPE="aarch64-unknown-linux-gnu" ;;
-            *) echo "Unsupported_arch: $ARCH"; return 1 ;;
+        x86_64) ARCH_TYPE="x86_64-unknown-linux-gnu" ;;
+        aarch64 | arm64) ARCH_TYPE="aarch64-unknown-linux-gnu" ;;
+        *)
+            echo "Unsupported_arch: $ARCH"
+            return 1
+            ;;
         esac
         URL="https://github.com/sharkdp/fd/releases/download/${LATEST}/fd-${LATEST}-${ARCH_TYPE}.tar.gz"
         curl -LO "$URL"
@@ -71,9 +74,12 @@ install_bat() {
         LATEST=$(curl -s https://api.github.com/repos/sharkdp/bat/releases/latest | grep tag_name | cut -d '"' -f 4)
         ARCH=$(uname -m)
         case "$ARCH" in
-            x86_64) ARCH_TYPE="x86_64-unknown-linux-gnu" ;;
-            aarch64|arm64) ARCH_TYPE="aarch64-unknown-linux-gnu" ;;
-            *) echo "Unsupported arch: $ARCH"; return 1 ;;
+        x86_64) ARCH_TYPE="x86_64-unknown-linux-gnu" ;;
+        aarch64 | arm64) ARCH_TYPE="aarch64-unknown-linux-gnu" ;;
+        *)
+            echo "Unsupported arch: $ARCH"
+            return 1
+            ;;
         esac
         URL="https://github.com/sharkdp/bat/releases/download/${LATEST}/bat-${LATEST}-${ARCH_TYPE}.tar.gz"
         curl -LO "$URL"
@@ -101,9 +107,12 @@ install_rg() {
         LATEST=$(curl -s https://api.github.com/repos/BurntSushi/ripgrep/releases/latest | grep tag_name | cut -d '"' -f 4)
         ARCH=$(uname -m)
         case "$ARCH" in
-            x86_64) ARCH_TYPE="x86_64-unknown-linux-musl" ;;
-            aarch64|arm64) ARCH_TYPE="aarch64-unknown-linux-musl" ;;
-            *) echo "Unsupported arch: $ARCH"; return 1 ;;
+        x86_64) ARCH_TYPE="x86_64-unknown-linux-musl" ;;
+        aarch64 | arm64) ARCH_TYPE="aarch64-unknown-linux-musl" ;;
+        *)
+            echo "Unsupported arch: $ARCH"
+            return 1
+            ;;
         esac
         URL="https://github.com/BurntSushi/ripgrep/releases/download/${LATEST}/ripgrep-${LATEST}-${ARCH_TYPE}.tar.gz"
         curl -LO "$URL"
@@ -208,7 +217,53 @@ install_yazi() {
     echo "✔ yazi installed to $LOCAL_BIN"
 }
 
+install_delta() {
+    if has_command delta; then
+        echo "✔ delta is already installed"
+        return
+    fi
 
+    echo "Installing delta..."
+    cd "$TMP_DIR"
+    LATEST=$(curl -s https://api.github.com/repos/dandavison/delta/releases/latest | grep tag_name | cut -d '"' -f 4)
+    ARCH=$(uname -m)
+    case "$ARCH" in
+    x86_64) ARCH_TYPE="x86_64-unknown-linux-gnu" ;;
+    aarch64 | arm64) ARCH_TYPE="aarch64-unknown-linux-gnu" ;;
+    *) echo "Unsupported arch: $ARCH" && return 1 ;;
+    esac
+
+    URL="https://github.com/dandavison/delta/releases/download/${LATEST}/delta-${LATEST}-${ARCH_TYPE}.zip"
+    curl -LO "$URL"
+    tar -xf delta-${LATEST}-${ARCH_TYPE}.tar.gz
+    cp "delta-${LATEST}-${ARCH_TYPE}/delta" "$LOCAL_BIN"
+    chmod +x "$LOCAL_BIN/delta"
+    echo "✔ delta installed to $LOCAL_BIN"
+}
+
+install_zoxide() {
+    if has_command zoxide; then
+        echo "✔ zoxide is already installed"
+        return
+    fi
+
+    echo "Installing zoxide..."
+    cd "$TMP_DIR"
+    LATEST=$(curl -s https://api.github.com/repos/ajeetdsouza/zoxide/releases/latest | grep tag_name | cut -d '"' -f 4)
+    ARCH=$(uname -m)
+    case "$ARCH" in
+    x86_64) ARCH_TYPE="x86_64-unknown-linux-gnu" ;;
+    aarch64 | arm64) ARCH_TYPE="aarch64-unknown-linux-gnu" ;;
+    *) echo "Unsupported arch: $ARCH" && return 1 ;;
+    esac
+
+    URL="https://github.com/ajeetdsouza/zoxide/releases/download/${LATEST}/zoxide-${LATEST}-${ARCH_TYPE}.zip"
+    curl -LO "$URL"
+    unzip -q zoxide-${LATEST}-${ARCH_TYPE}.zip
+    cp "zoxide-${LATEST}-${ARCH_TYPE}/delta" "$LOCAL_BIN"
+    chmod +x "$LOCAL_BIN/zoxide"
+    echo "✔ zoxide installed to $LOCAL_BIN"
+}
 
 ##################################################
 # Main
@@ -222,9 +277,9 @@ install_bat
 install_rg
 install_eza
 install_yazi
+install_delta
 install_nvim
 
 echo ""
 echo "✅ All tools installed."
 echo "➡ Make sure $HOME/.local/bin is in your PATH!"
-

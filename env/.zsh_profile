@@ -1,7 +1,7 @@
 export XDG_CONFIG_HOME=$HOME/.config
 VIM="nvim"
 
-DEV_ENV=$HOME/dev
+DEV_ENV=$HOME/personal/dev
 
 PERSONAL=$XDG_CONFIG_HOME/personal
 for i in `find -L $PERSONAL`; do
