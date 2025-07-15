@@ -3,5 +3,5 @@ export PATH=$PATH:$HOME/.local/scripts
 export PATH=$PATH:$HOME/.local/bin
 
 # make CapsLock behave like Ctrl:
-setxkbmap -option ctrl:nocaps
+setxkbmap -option caps:escape
 xinput set-prop "DELL09E2:00 04F3:30CB Touchpad" "libinput Tapping Enabled" 1
