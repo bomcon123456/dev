@@ -1,7 +1,7 @@
 export XDG_CONFIG_HOME=$HOME/.config
 VIM="nvim"
 
-DEV_ENV=$HOME/personal/dev
+export DEV_ENV=$HOME/personal/dev
 
 PERSONAL=$XDG_CONFIG_HOME/personal
 for i in `find -L $PERSONAL`; do
@@ -10,7 +10,6 @@ done
 
 
 export GIT_EDITOR=$VIM
-export DEV_ENV_HOME="$HOME/personal/dev"
 
 dev_env() {
 
