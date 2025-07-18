@@ -196,7 +196,7 @@ install_eza() {
         fi
 
         chmod +x "$LOCAL_BIN/eza"
-        mv "$LOCAL_BIN/eza" "$LOCAL_BIN/exa"
+        mv "$LOCAL_BIN/eza" "$LOCAL_BIN/eza"
         echo "✔ eza installed to $LOCAL_BIN"
     fi
 }
