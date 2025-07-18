@@ -118,9 +118,9 @@ elif [ "$is_server" = true ]; then
     copy $DEV_ENV/env/.zshrc.local.linux $HOME/.zshrc.local
 elif [ "$is_q" = true ]; then
     echo "Copying q-specific config..."
-    copy $DEV_ENV/work_env/env/.gitconfig.local $HOME/.gitconfig.local
-    copy $DEV_ENV/work_env/env/.zshrc.local $HOME/.zshrc.local
-    copy $DEV_ENV/work_env/env/.local/scripts/* $HOME/.local/scripts/
+    copy $DEV_ENV/workdev/env/.gitconfig.local $HOME/.gitconfig.local
+    copy $DEV_ENV/workdev/env/.zshrc.local $HOME/.zshrc.local
+    copy $DEV_ENV/workdev/env/.local/scripts/* $HOME/.local/scripts/
 fi
 
 copy $DEV_ENV/dev-env $HOME/.local/scripts/dev-env
