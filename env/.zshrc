@@ -77,7 +77,7 @@ function yy() {
 
 
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=13'
+source ~/.zsh_profile
 
 eval "$(zoxide init zsh)"
-source ~/.zsh_profile
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
