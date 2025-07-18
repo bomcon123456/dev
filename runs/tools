@@ -241,7 +241,7 @@ install_delta() {
     *) echo "Unsupported arch: $ARCH" && return 1 ;;
     esac
 
-    URL="https://github.com/dandavison/delta/releases/download/${LATEST}/delta-${LATEST}-${ARCH_TYPE}.zip"
+    URL="https://github.com/dandavison/delta/releases/download/${LATEST}/delta-${LATEST}-${ARCH_TYPE}.tar.gz"
     curl -LO "$URL"
     tar -xf delta-${LATEST}-${ARCH_TYPE}.tar.gz
     cp "delta-${LATEST}-${ARCH_TYPE}/delta" "$LOCAL_BIN"
