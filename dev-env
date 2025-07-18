@@ -35,6 +35,10 @@ server)
     echo "Detected server environment via WS=$WS"
     is_server=true
     ;;
+q)
+    echo "Detected Q environment via WS=$WS"
+    is_q=true
+    ;;
 *)
     echo "Warning: Unknown WS environment value: $WS"
     exit 1
@@ -112,6 +116,11 @@ elif [ "$is_server" = true ]; then
     echo "Copying server-specific config..."
     copy $DEV_ENV/env/.gitconfig.local.linux $HOME/.gitconfig.local
     copy $DEV_ENV/env/.zshrc.local.linux $HOME/.zshrc.local
+elif [ "$is_q" = true ]; then
+    echo "Copying q-specific config..."
+    copy $DEV_ENV/env/.gitconfig.local.linux $HOME/.gitconfig.local
+    copy $DEV_ENV/work_env/env/.zshrc.local $HOME/.zshrc.local
+    copy $DEV_ENV/work_env/env/.local/scripts/* $HOME/.local/scripts/
 fi
 
 copy $DEV_ENV/dev-env $HOME/.local/scripts/dev-env
