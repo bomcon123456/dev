@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 dry_run="0"
+YELLOW='\033[33m'
+RED='\033[31m'
+NC='\033[0m' # No Color
 
 if [ -z "$XDG_CONFIG_HOME" ]; then
     echo "no xdg config set"
@@ -37,6 +40,10 @@ server)
     ;;
 q)
     echo "Detected Q environment via WS=$WS"
+    if [ ! -d "workdev" ]; then
+        echo "Error: workdev folder does not exist. Please clone it first."
+        exit 1
+    fi
     is_q=true
     ;;
 *)
@@ -45,7 +52,7 @@ q)
     ;;
 esac
 
-if [[ $1 == "--dry" ]]; then
+if [[ $1 == "-d" || $1 == "--dry" || $1 == "--dry-run" ]]; then
     dry_run="1"
 fi
 
@@ -66,13 +73,13 @@ update_files() {
         configs=$(find . -mindepth 1 -maxdepth 1 -type d)
         for c in $configs; do
             directory=${2%/}/${c#./}
-            log "    removing: rm -rf $directory"
+            log "    ${RED}removing: rm -rf $directory${NC}"
 
             if [[ $dry_run == "0" ]]; then
                 rm -rf $directory
             fi
 
-            log "    copying env: cp $c $2"
+            log "    ${YELLOW}copying env: cp $c $2${NC}"
             if [[ $dry_run == "0" ]]; then
                 cp -r ./$c $2
             fi
@@ -83,11 +90,11 @@ update_files() {
 }
 
 copy() {
-    log "removing: $2"
+    log "${RED}removing: $2${NC}"
     if [[ $dry_run == "0" ]]; then
         rm $2
     fi
-    log "copying: $1 to $2"
+    log "${YELLOW}copying: $1 to $2${NC}"
     if [[ $dry_run == "0" ]]; then
         cp $1 $2
     fi
@@ -105,11 +112,15 @@ copy $DEV_ENV/env/.gitconfig $HOME/.gitconfig
 
 if [ "$is_linux" = true ]; then
     echo "Copying linux-specific config..."
+    update_files $DEV_ENV/env/.config.linux $XDG_CONFIG_HOME
+
     copy $DEV_ENV/env/.xprofile $HOME/.xprofile
     copy $DEV_ENV/env/.gitconfig.local.linux $HOME/.gitconfig.local
     copy $DEV_ENV/env/.zshrc.local.linux $HOME/.zshrc.local
 elif [ "$is_mac" = true ]; then
     echo "Copying macOS-specific config..."
+    update_files $DEV_ENV/env/.config.mac $XDG_CONFIG_HOME
+
     copy $DEV_ENV/env/.gitconfig.local.mac $HOME/.gitconfig.local
     copy $DEV_ENV/env/.zshrc.local.mac $HOME/.zshrc.local
 elif [ "$is_server" = true ]; then
@@ -127,14 +138,16 @@ copy $DEV_ENV/dev-env $HOME/.local/scripts/dev-env
 
 mkdir -p $HOME/.local/bin
 
-if command -v conda &>/dev/null; then
-    echo "Conda found, initializing..."
-    conda init zsh
-    sed -n '/>>> conda initialize >>>/,/<<< conda initialize <<</p' ~/.zshrc >>~/.zshrc.local
-    sed -i '/>>> conda initialize >>>/,/<<< conda initialize <<</d' ~/.zshrc
-    conda init bash
-    sed -n '/>>> conda initialize >>>/,/<<< conda initialize <<</p' ~/.bashrc >>~/.bashrc.local
-    sed -i '/>>> conda initialize >>>/,/<<< conda initialize <<</d' ~/.bashrc
-else
-    echo "Conda not found in PATH. Skipping initialization."
+if [[ $dry_run == "1" ]]; then
+    if command -v conda &>/dev/null; then
+        echo "Conda found, initializing..."
+        conda init zsh
+        sed -n '/>>> conda initialize >>>/,/<<< conda initialize <<</p' ~/.zshrc >>~/.zshrc.local
+        sed -i '/>>> conda initialize >>>/,/<<< conda initialize <<</d' ~/.zshrc
+        conda init bash
+        sed -n '/>>> conda initialize >>>/,/<<< conda initialize <<</p' ~/.bashrc >>~/.bashrc.local
+        sed -i '/>>> conda initialize >>>/,/<<< conda initialize <<</d' ~/.bashrc
+    else
+        echo "Conda not found in PATH. Skipping initialization."
+    fi
 fi
