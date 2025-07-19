@@ -58,9 +58,9 @@ fi
 
 log() {
     if [[ $dry_run == "1" ]]; then
-        echo "[DRY_RUN]: $1"
+        echo -e "[DRY_RUN]: $1"
     else
-        echo "$1"
+        echo -e "$1"
     fi
 }
 
@@ -138,15 +138,15 @@ copy $DEV_ENV/dev-env $HOME/.local/scripts/dev-env
 
 mkdir -p $HOME/.local/bin
 
-if [[ $dry_run == "1" ]]; then
+if [[ $dry_run == "0" ]]; then
     if command -v conda &>/dev/null; then
         echo "Conda found, initializing..."
         conda init zsh
         sed -n '/>>> conda initialize >>>/,/<<< conda initialize <<</p' ~/.zshrc >>~/.zshrc.local
-        sed -i '/>>> conda initialize >>>/,/<<< conda initialize <<</d' ~/.zshrc
+        sed -i '' '/>>> conda initialize >>>/,/<<< conda initialize <<</d' ~/.zshrc
         conda init bash
         sed -n '/>>> conda initialize >>>/,/<<< conda initialize <<</p' ~/.bashrc >>~/.bashrc.local
-        sed -i '/>>> conda initialize >>>/,/<<< conda initialize <<</d' ~/.bashrc
+        sed -i '' '/>>> conda initialize >>>/,/<<< conda initialize <<</d' ~/.zshrc
     else
         echo "Conda not found in PATH. Skipping initialization."
     fi
