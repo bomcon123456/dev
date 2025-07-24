@@ -1,4 +1,16 @@
+gui:
+  nerdFontsVersion: "3"
+  theme:
+    selectedLineBgColor:
+      - default
+    cherryPickedCommitBgColor:
+      - default
+      - underline
+    cherryPickedCommitFgColor:
+      - yellow
 git:
   paging:
     colorArg: always
-    pager: delta --dark --paging=never
+    pager: DELTA_FEATURES=+lazygit delta --dark --paging=never
+notARepository: quit
+promptToReturnFromSubprocess: false
